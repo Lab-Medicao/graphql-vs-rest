@@ -1,0 +1,18 @@
+{
+  "name": "graphql-vs-rest-experiment",
+  "version": "1.0.0",
+  "description": "Experimento controlado comparando performance entre GraphQL e REST",
+  "main": "src/experiment.js",
+  "scripts": {
+    "start": "node src/experiment.js",
+    "test": "node src/test-setup.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "graphql-request": "^6.1.0",
+    "fs-extra": "^11.1.1",
+    "dotenv": "^16.3.1"
+  },
+  "author": "Lab Experimentação - UFLA",
+  "license": "MIT"
+}
