@@ -2,14 +2,14 @@
 
 ## Pré-requisitos
 
-1. **Node.js** (versão 16 ou superior)
+1. **Python** (versão 3.8 ou superior)
 2. **Token do GitHub** com acesso às APIs REST e GraphQL
 
 ## Configuração
 
 ### 1. Instalar dependências
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 
 ### 2. Configurar token do GitHub
@@ -28,7 +28,7 @@ npm install
 
 ### 3. Testar configuração
 ```bash
-npm test
+python src/test_setup.py
 ```
 
 Este comando irá:
@@ -39,19 +39,19 @@ Este comando irá:
 
 ### 4. Executar experimento
 ```bash
-npm start
+python src/experiment.py
 ```
 
 ## Estrutura do Projeto
 
 ```
 src/
-├── config.js          # Configurações do experimento
-├── queries.js         # Consultas REST e GraphQL
-├── clients.js         # Clientes HTTP para ambas APIs
-├── data-collector.js  # Coleta e armazenamento de dados
-├── experiment.js      # Script principal do experimento
-└── test-setup.js      # Teste de configuração
+├── config.py          # Configurações do experimento
+├── queries.py         # Consultas REST e GraphQL
+├── clients.py         # Clientes HTTP para ambas APIs
+├── data_collector.py  # Coleta e armazenamento de dados
+├── experiment.py      # Script principal do experimento
+└── test_setup.py      # Teste de configuração
 
 results/               # Arquivos CSV com resultados
 ```

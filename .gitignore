@@ -1,5 +1,11 @@
-node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 .env
 results/*.csv
 *.log
 .DS_Store
+venv/
+.venv/
