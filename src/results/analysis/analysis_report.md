@@ -7,14 +7,14 @@
 ## RQ1 — Tempos de resposta
 - Teste: mannwhitney (stat=669813258.0, p=0.9907173731121247)
 - Decisão: Não rejeita H0
-- Tamanho de efeito aproximado: 0.003028
+- Tamanho de efeito aproximado: 0.030869
 
 ## RQ2 — Tamanho de payload
 - Teste: mannwhitney (stat=1025132470.0, p=0.0)
 - Decisão: Rejeita H0
-- Tamanho de efeito aproximado: 0.512691
+- Tamanho de efeito aproximado: 0.529312
 
 ## Visualizações
-- results\plots\boxplot_response_time.png
-- results\plots\hist_payload.png
-- results\plots\bar_means.png
+![Boxplot Tempo de Resposta](plots/boxplot_response_time.png)
+![Distribuição do Payload](plots/hist_payload.png)
+![Média por Tratamento](plots/bar_means.png)
