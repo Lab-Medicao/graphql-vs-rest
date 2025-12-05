@@ -48,25 +48,22 @@ Observações: Hipóteses focadas em desempenho de API, não em maturidade de re
 - Cache ligado (warm) vs desligado (cold).
 - Níveis de carga: valores de `concurrent_clients`.
 
-### 2.5 Objetos experimentais
-
-- REST: `simple`, `nested`, `aggregated` conforme endpoints.
+## 2.5 Objetos experimentais
+- REST: `simple`, `nested`, `aggregated` conforme endpoints definidos.
 - GraphQL: queries equivalentes conforme definidas.
 
-### Tipo de projeto experimental
+## 2.6 Tipo de Projeto Experimental
+Projeto fatorial completo e balanceado, entre-sujeitos por tratamento (combinações de `api_type`, `query_type`, `cache_state` e níveis de `concurrent_clients`). As medições são repetidas por cliente em cada tratamento para capturar variabilidade intra-tratamento.
 
-Fatorial completo e balanceado, entre-sujeitos, com medições repetidas por cliente em cada tratamento.
+## 2.7 Quantidade de medições (N)
+Definimos N por tratamento considerando estabilidade estatística dos estimadores (média/mediana) e poder do teste. Valores típicos de N≥50 por condição são desejáveis para testes não-paramétricos e para mitigar variância sob alta concorrência. Neste experimento, adotamos N=config['experiment']['repetitions'] por cliente, garantindo amostragem suficiente por combinação de tratamentos.
 
-### Quantidade de medições (N)
+## 2.8 Ameaças à validade
+- Conclusão: Viés de implementação: diferenças específicas de endpoints podem favorecer um estilo de API.; Interpretação indevida de significância estatística sem tamanho de efeito.
+- Interna: Variações de rede/latência externa durante as medidas.; Efeito de aquecimento/caching em camadas não controladas (CDN/servidor).
+- Externa: Generalização limitada a outros domínios além do GitHub API.; Resultados podem depender de modelos de dados e cargas diferentes.
+- Estatística: Não-normalidade das distribuições de tempo/tamanho; necessidade de testes não-paramétricos.; Outliers e heterocedasticidade sob concorrência alta.
 
-`config['experiment']['repetitions']` por cliente. Para estabilidade em testes não-paramétricos, valores típicos N≥50 por condição.
-
-### Ameaças à validade
-
-- Conclusão: viés de implementação; interpretação sem tamanho de efeito.
-- Interna: variação de rede/latência; caching em camadas não controladas.
-- Externa: generalização limitada além do GitHub API.
-- Estatística: não-normalidade; outliers; heterocedasticidade sob alta concorrência.
 
 ---
 
