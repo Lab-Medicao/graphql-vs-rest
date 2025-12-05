@@ -1,5 +1,10 @@
 .vscode/
 node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 .env
 results/*.csv
 *.log
@@ -8,3 +13,5 @@ results/*.csv
 # Python
 __pycache__/
 *.pyc
+venv/
+.venv/
