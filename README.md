@@ -49,21 +49,24 @@ Observações: Hipóteses focadas em desempenho de API, não em maturidade de re
 - Níveis de carga: valores de `concurrent_clients`.
 
 ## 2.5 Objetos experimentais
+
 - REST: `simple`, `nested`, `aggregated` conforme endpoints definidos.
 - GraphQL: queries equivalentes conforme definidas.
 
 ## 2.6 Tipo de Projeto Experimental
+
 Projeto fatorial completo e balanceado, entre-sujeitos por tratamento (combinações de `api_type`, `query_type`, `cache_state` e níveis de `concurrent_clients`). As medições são repetidas por cliente em cada tratamento para capturar variabilidade intra-tratamento.
 
 ## 2.7 Quantidade de medições (N)
+
 Definimos N por tratamento considerando estabilidade estatística dos estimadores (média/mediana) e poder do teste. Valores típicos de N≥50 por condição são desejáveis para testes não-paramétricos e para mitigar variância sob alta concorrência. Neste experimento, adotamos N=config['experiment']['repetitions'] por cliente, garantindo amostragem suficiente por combinação de tratamentos.
 
 ## 2.8 Ameaças à validade
+
 - Conclusão: Viés de implementação: diferenças específicas de endpoints podem favorecer um estilo de API.; Interpretação indevida de significância estatística sem tamanho de efeito.
 - Interna: Variações de rede/latência externa durante as medidas.; Efeito de aquecimento/caching em camadas não controladas (CDN/servidor).
 - Externa: Generalização limitada a outros domínios além do GitHub API.; Resultados podem depender de modelos de dados e cargas diferentes.
 - Estatística: Não-normalidade das distribuições de tempo/tamanho; necessidade de testes não-paramétricos.; Outliers e heterocedasticidade sob concorrência alta.
-
 
 ---
 
@@ -348,7 +351,38 @@ Como trabalhos futuros, seria interessante: (i) repetir o experimento com outros
 
 ---
 
-## 9. Referências
+## 9. Glossário
+
+| Termo/Sigla                         | Definição                                                                                                                         |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Cache cold                          | Estado em que não há dados previamente armazenados no cache. Primeiras requisições tendem a ter maior latência e maior variância. |
+| Cache warm                          | Cache “aquecido”, já populado por requisições anteriores; maior probabilidade de cache hit e menor latência.                      |
+| Warm-up                             | Fase de aquecimento executada antes das medições para popular o cache (quando `cache_state = warm`).                              |
+| Cache hit / miss                    | Hit: resposta servida a partir do cache. Miss: precisa buscar na origem (API/servidor).                                           |
+| TTL (Time To Live)                  | Tempo de vida de um item no cache; após expirar, precisa ser revalidado/recapturado.                                              |
+| Rate limit                          | Limite de requisições permitido por janela de tempo pela API (ex.: GitHub).                                                       |
+| RPS                                 | Requests per second (requisições por segundo), indicador de taxa de tráfego.                                                      |
+| P95 / P99                           | Percentis do tempo de resposta; P95 é o valor abaixo do qual 95% das requisições caem (cauda de latência).                        |
+| Payload                             | Corpo da resposta transferido pela rede; medido aqui em bytes (`payload_size_bytes`).                                             |
+| Over-fetching                       | Retornar mais dados do que o necessário (comum em REST quando o endpoint fornece campos extras).                                  |
+| Under-fetching                      | Retornar menos dados do que o necessário, exigindo chamadas adicionais.                                                           |
+| Batching                            | Agrupar múltiplas operações em uma única chamada HTTP para reduzir overhead de conexão.                                           |
+| Paginação (cursor/offset)           | Estratégias para navegar por coleções grandes. GitHub GraphQL usa cursor-based (`edges`, `nodes`, `pageInfo`).                    |
+| Consulta simple                     | Consulta com um único recurso e poucos campos, sem relacionamentos aninhados.                                                     |
+| Consulta nested                     | Consulta que inclui relacionamentos/coleções aninhadas (ex.: repositório → issues → comments).                                    |
+| Consulta aggregated                 | Consulta que combina múltiplos recursos ou agrega estatísticas/contagens em uma única resposta.                                   |
+| N+1 (anti-padrão)                   | Buscar itens filhos individualmente para cada item pai, gerando N+1 chamadas; mitiga-se com DataLoader/batching.                  |
+| Resolver (GraphQL)                  | Função que busca/preenche o valor de um campo do schema GraphQL a partir de uma fonte de dados.                                   |
+| Schema (GraphQL)                    | Contrato de tipos, consultas, mutações e subscriptions que define as formas de acesso aos dados.                                  |
+| Endpoint (REST)                     | URL que representa um recurso/ação específica em REST.                                                                            |
+| Query (GraphQL)                     | Documento declarativo que especifica exatamente os campos a retornar.                                                             |
+| Idempotência                        | Operação que pode ser repetida sem efeitos adicionais (ex.: GET é idempotente).                                                   |
+| Concorrência (`concurrent_clients`) | Número de clientes simultâneos executando requisições no experimento.                                                             |
+| Status code HTTP                    | Código de retorno (2xx sucesso, 4xx erro do cliente, 5xx erro do servidor).                                                       |
+
+---
+
+## 10. Referências
 
 Referências:
 
@@ -359,10 +393,8 @@ Referências:
 
 ---
 
-## 10. Apêndices
+## 11. Apêndices
 
 - Scripts utilizados para coleta e análise de dados: `src/`
 - Consultas GraphQL e endpoints REST: `src/queries.py`
 - Arquivos CSV gerados: `results/`
-
----
