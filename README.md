@@ -367,5 +367,6 @@ Referências:
 - Scripts utilizados para coleta e análise de dados: `src/`
 - Consultas GraphQL e endpoints REST: `src/queries.py`
 - Arquivos CSV gerados: `results/`
+- Google Looker Studio: [Dashboard - LAB05S03](https://lookerstudio.google.com/reporting/c981ba21-8fff-4106-9dc2-f9d9fe5e1e51)
 
 ---

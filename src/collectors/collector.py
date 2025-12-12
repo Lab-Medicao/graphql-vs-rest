@@ -109,7 +109,6 @@ def _generate_treatments() -> List[Dict[str, Any]]:
 
 def run_experiment() -> str:
     _setup_logging()
-    _ = get_design_summary()
     csv_path = _new_csv_path()
 
     with open(csv_path, "w", newline="", encoding="utf-8") as f:

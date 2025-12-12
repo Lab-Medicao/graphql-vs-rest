@@ -11,7 +11,8 @@ def ensure_dir(path: Path) -> Path:
 
 
 def load_data(csv_path: Path) -> pd.DataFrame:
-    df = pd.read_csv(csv_path, parse_dates=["timestamp"], infer_datetime_format=True)
+    df = pd.read_csv(csv_path, parse_dates=[
+                     "timestamp"], infer_datetime_format=True)
     # Normalize categorical columns
     for col in ["api_type", "query_type", "cache_state"]:
         if col in df.columns:
@@ -32,7 +33,8 @@ def plot_distributions(df: pd.DataFrame, out_dir: Path):
 
     # Overall response time distribution
     fig, ax = plt.subplots(figsize=(8, 5))
-    sns.histplot(df["response_time_ms"], kde=True, ax=ax, bins=50, color="#3b82f6")
+    sns.histplot(df["response_time_ms"], kde=True,
+                 ax=ax, bins=50, color="#3b82f6")
     ax.set_title("Distribuição de Tempo de Resposta (ms)")
     ax.set_xlabel("Tempo de resposta (ms)")
     ax.set_ylabel("Contagem")
@@ -60,8 +62,10 @@ def plot_time_series(df: pd.DataFrame, out_dir: Path):
     fig, ax = plt.subplots(figsize=(10, 6))
     for api in df["api_type"].cat.categories:
         sub = df[df["api_type"] == api].sort_values("timestamp")
-        sub = sub.set_index("timestamp").resample("1S").median(numeric_only=True)
-        ax.plot(sub.index, sub["response_time_ms"].rolling(5, min_periods=1).median(), label=api)
+        sub = sub.set_index("timestamp").resample(
+            "1S").median(numeric_only=True)
+        ax.plot(sub.index, sub["response_time_ms"].rolling(
+            5, min_periods=1).median(), label=api)
     ax.set_title("Série Temporal (Mediana Móvel) de Tempo de Resposta")
     ax.set_xlabel("Tempo")
     ax.set_ylabel("Tempo de resposta (ms)")
@@ -114,14 +118,16 @@ def plot_relationships(df: pd.DataFrame, out_dir: Path):
     save_figure(fig, out_dir, "throughput_per_sec")
 
     # Taxa de sucesso/erro por api_type e cache_state
-    df["is_success"] = (df.get("status_code", 200) >= 200) & (df.get("status_code", 200) < 300)
+    df["is_success"] = (df.get("status_code", 200) >= 200) & (
+        df.get("status_code", 200) < 300)
     fig, ax = plt.subplots(figsize=(10, 6))
     pct = (
         df.groupby(["api_type", "cache_state"])['is_success']
         .mean()
         .reset_index()
     )
-    sns.barplot(data=pct, x="api_type", y="is_success", hue="cache_state", ax=ax)
+    sns.barplot(data=pct, x="api_type", y="is_success",
+                hue="cache_state", ax=ax)
     ax.set_title("Taxa de Sucesso por API e Cache")
     ax.set_xlabel("API")
     ax.set_ylabel("Taxa de sucesso")
@@ -135,7 +141,8 @@ def plot_dashboard(df: pd.DataFrame, out_dir: Path):
 
     # dist_response_time
     ax = axes[0, 0]
-    sns.histplot(df["response_time_ms"], kde=True, ax=ax, bins=50, color="#3b82f6")
+    sns.histplot(df["response_time_ms"], kde=True,
+                 ax=ax, bins=50, color="#3b82f6")
     ax.set_title("Distribuição de Tempo de Resposta (ms)")
     ax.set_xlabel("Tempo de resposta (ms)")
     ax.set_ylabel("Contagem")
@@ -153,13 +160,15 @@ def plot_dashboard(df: pd.DataFrame, out_dir: Path):
 
     # success_rate_api_cache
     ax = axes[0, 2]
-    df["is_success"] = (df.get("status_code", 200) >= 200) & (df.get("status_code", 200) < 300)
+    df["is_success"] = (df.get("status_code", 200) >= 200) & (
+        df.get("status_code", 200) < 300)
     pct = (
         df.groupby(["api_type", "cache_state"])['is_success']
         .mean()
         .reset_index()
     )
-    sns.barplot(data=pct, x="api_type", y="is_success", hue="cache_state", ax=ax)
+    sns.barplot(data=pct, x="api_type", y="is_success",
+                hue="cache_state", ax=ax)
     ax.set_title("Taxa de Sucesso por API e Cache")
     ax.set_xlabel("API")
     ax.set_ylabel("Taxa de sucesso")
@@ -196,11 +205,13 @@ def plot_dashboard(df: pd.DataFrame, out_dir: Path):
 
     save_figure(fig, out_dir, "dashboard_overview")
 
+
 def generate_all_plots(csv_path: str, out_dir: str | None = None):
     csv_path = Path(csv_path)
     if out_dir is None:
         # Save under src/results/analysis/plots
-        out_dir = Path(__file__).resolve().parents[1] / "results" / "analysis" / "plots"
+        out_dir = Path(__file__).resolve(
+        ).parents[1] / "results" / "analysis" / "plots"
     else:
         out_dir = Path(out_dir)
     ensure_dir(out_dir)
@@ -217,9 +228,11 @@ if __name__ == "__main__":
     base = Path(__file__).resolve().parents[1] / "results"
     candidates = sorted(base.glob("experiment_*.csv"))
     if not candidates:
-        raise SystemExit("Nenhum arquivo de experimento encontrado em src/results")
+        raise SystemExit(
+            "Nenhum arquivo de experimento encontrado em src/results")
     latest = candidates[-1]
     print(f"Gerando gráficos a partir de: {latest}")
     # Save under src/results/analysis/plots
-    out = Path(__file__).resolve().parents[1] / "results" / "analysis" / "plots"
+    out = Path(__file__).resolve(
+    ).parents[1] / "results" / "analysis" / "plots"
     generate_all_plots(str(latest), str(out))
