@@ -262,6 +262,53 @@ Resultados gerados a partir do CSV `results/experiment_YYYY-MM-DDTHH-MM-SS.csv` 
 - REST apresenta dois agrupamentos adicionais de payloads grandes (na faixa de alguns kB e dezenas de kB), enquanto GraphQL concentra-se mais em tamanhos intermediários, com menos ocorrências na cauda mais extrema.
 - Visualmente, isso sugere uma diferença sistemática no tamanho dos payloads entre REST e GraphQL, o que será confirmado pelos testes estatísticos.
 
+<p align="center"> <img src="/src/results/analysis/plots/success_rate_api_cache.png" height="500"/> <br/> <em>Gráfico 4 - Taxa de sucesso por tipo de API e estado de cache</em> </p>
+
+- O gráfico de barras compara a proporção de requisições bem-sucedidas (taxa de sucesso, eixo Y) entre GraphQL vs REST, separando por `cache_state` = `cold`/`warm`.
+- Visualmente, a REST com cache warm apresenta a maior taxa de sucesso (aprox. 0,33), enquanto REST cold fica por volta de 0,16. Isso sugere um efeito positivo do cache (`warm`) sobre sucesso mais forte em REST.
+- Em GraphQL, a taxa de sucesso é baixa e praticamente não muda entre `cold` e `warm` (aprox. 0,11–0,12), sugerindo que o “warm cache” não altera muito o comportamento de sucesso nesse cenário.
+- Ponto de atenção importante: as taxas absolutas estão bem baixas (todas abaixo de 0,35). Isso normalmente indica que:
+  - a definição de “sucesso” pode estar restritiva (ex.: só `status_code == 200`), ou
+  - há muitas respostas não-200, timeouts, erros, rate-limit etc.
+- Há forte evidência visual de interação entre cache e API (warm ajuda bem mais a REST).
+
+<p align="center"> <img src="/src/results/analysis/plots/violin_cache_api.png" height="500"/> <br/> <em>Gráfico 5 - Violino do tempo de resposta por estado de cache e tipo de API</em> </p>
+
+- Os violinos mostram a distribuição completa de response_time_ms para cada cache_state (`cold`/`warm`), com comparação entre GraphQL e REST (cores).
+- Os formatos são muito semelhantes entre GraphQL e REST, tanto em `cold` quanto em `warm`, com forte sobreposição. Isso reforça o padrão já visto: as diferenças entre APIs são pequenas quando comparadas à variabilidade interna.
+- O gráfico sugere uma distribuição bimodal (dois “bojos”):
+  - um grupo de respostas mais rápidas (~800–1200 ms),
+  - e um grupo principal bem maior (~3300–4200 ms).
+Isso pode indicar dois regimes de execução (ex.: tipos de consulta diferentes, condições de rede, variação do serviço do GitHub, concorrência, etc.).
+- Há também cauda longa e outliers chegando a ~7–8 s, em ambos os estados de cache e APIs, o que novamente favorece a escolha de medidas robustas (mediana/percentis) e testes não paramétricos.
+- Em resumo: `warm` vs `cold` não parece deslocar fortemente a distribuição, e GraphQL vs REST é muito parecido, mas existe bimodalidade e alta variabilidade, sugerindo influência dominante de fatores externos.
+
+<p align="center"> <img src="/src/results/analysis/plots/dist_response_time.png" height="500"/> <br/> <em>Gráfico 6 - Distribuição global do tempo de resposta (histograma + densidade)</em> </p>
+
+- O histograma com curva de densidade mostra a distribuição global de response_time_ms (sem separar por API/cache).
+- O comportamento é claramente bimodal:
+  - um pico menor por volta de ~900–1100 ms,
+  - e um pico dominante por volta de ~3500–4000 ms.
+- Isso sugere que o experimento mistura dois grupos de comportamento (por exemplo: endpoints/consultas com custos distintos, cache efetivo em parte do tráfego, variações de rede/servidor, ou até fases do experimento com carga diferente).
+- A distribuição tem cauda longa até ~7500 ms, então a média pode ser pouco representativa do “típico”; faz mais sentido falar em mediana, p90/p95 e comparar ECDF/percentis.
+- O tempo de resposta não é unimodal/normal; há estruturas internas (dois regimes), o que ajuda a explicar por que diferenças entre APIs podem ficar “diluídas” quando você olha só para média.
+
+<p align="center"> <img src="/src/results/analysis/plots/ecdf_response_time.png" height="500"/> <br/> <em>Gráfico 7 - ECDF do tempo de resposta por tipo de API</em> </p>
+
+- A ECDF* compara a fração acumulada de requisições com tempo ≤ X ms (percentis visuais).
+- As curvas são quase sobrepostas, indicando que GraphQL e REST têm distribuições muito similares no geral.
+- Há uma leve vantagem do GraphQL na região intermediária (percentis médios), mas a diferença é pequena e as caudas convergem — ou seja, nos piores casos extremos o comportamento é parecido.
+- Visualmente, não há ganho consistente e grande de latência ao trocar REST por GraphQL.
+
+> _*ECDF, ou Função de Distribuição Acumulada Empírica, é uma estimativa da função de distribuição cumulativa que gera um conjunto de dados amostrais, mostrando a proporção de observações menores ou iguais a um determinado valor._
+
+<p align="center"> <img src="/src/results/analysis/plots/throughput_per_sec.png" height="500"/> <br/> <em>Gráfico 8 - Vazão aproximada (req/s) ao longo do tempo por API</em> </p>
+
+- O gráfico mostra quantas requisições por segundo ocorreram ao longo do tempo, separadas por API.
+- Os padrões de bursts/picos aparecem em ambos: existem períodos de alta atividade e períodos com baixa ou nenhuma requisição.
+- O principal valor metodológico aqui é validar comparabilidade de carga: não parece que uma API foi testada sempre sob uma carga muito maior do que a outra (apesar de haver janelas alternadas).
+- Em resumo: esse gráfico funciona como controle experimental (carga ao longo do tempo), complementando os gráficos de latência.
+
 ---
 
 ### 7.2 Estatísticas Descritivas
